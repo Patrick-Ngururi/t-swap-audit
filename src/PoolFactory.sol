@@ -15,7 +15,7 @@
 pragma solidity 0.8.20;
 
 import { TSwapPool } from "./TSwapPool.sol";
-import { IERC20 } from "forge-std/interfaces/IERC20.sol";
+import { IERC20 } from "lib/forge-std/src/interfaces/IERC20.sol";
 
 contract PoolFactory {
     error PoolFactory__PoolAlreadyExists(address tokenAddress);
