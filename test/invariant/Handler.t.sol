@@ -11,6 +11,8 @@ contract Handler is Test {
     ERC20Mock weth;
     ERC20Mock poolToken;
 
+    address liquidityProvider = makeAddr("lp");
+
     // Ghost Variables - variables that only exist in our Handler
     int256 public expectedDeltaY;
     int256 public expectedDeltaX;
