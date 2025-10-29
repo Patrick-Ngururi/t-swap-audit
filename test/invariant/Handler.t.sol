@@ -12,6 +12,7 @@ contract Handler is Test {
     ERC20Mock poolToken;
 
     address liquidityProvider = makeAddr("lp");
+    address swapper = makeAddr("swapper");
 
     // Ghost Variables - variables that only exist in our Handler
     int256 public expectedDeltaY;
@@ -27,13 +28,47 @@ contract Handler is Test {
         poolToken = ERC20Mock(_pool.getPoolToken());
     }
 
-   function deposit(uint256 wethAmount) public {
+    function swapPoolTokenForWethBasedOnOutputWeth(uint256 outputWeth) public {
+        outputWeth = bound(outputWeth, 0, type(uint64).max);
+        if (outputWeth >= weth.balanceOf(address(pool))) {
+            return;
+        }
+        uint256 poolTokenAmount = pool.getInputAmountBasedOnOutput(
+            outputWeth, poolToken.balanceOf(address(pool)), weth.balanceOf(address(pool))
+        );
+
+        if (poolTokenAmount >= type(uint64).max) {
+            return;
+        }
+
+        startingY = int256(weth.balanceOf(address(this)));
+        startingX = int256(poolToken.balanceOf(address(this)));
+        expectedDeltaX = int256(-1) * int256(outputWeth);
+        expectedDeltaY = int256(pool.getPoolTokensToDepositBasedOnWeth(poolTokenAmount));
+
+        if (poolToken.balanceOf(swapper) < poolTokenAmount) {
+            poolToken.mint(swapper, poolTokenAmount - poolToken.balanceOf(swapper) + 1);
+        }
+
+        vm.startPrank(swapper);
+        poolToken.approve(address(pool), type(uint256).max);
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        vm.stopPrank();
+
+        uint256 endingY = poolToken.balanceOf(address(pool));
+        uint256 endingX = weth.balanceOf(address(pool));
+
+        actualDeltaY = int256(endingY) - int256(startingY);
+        actualDeltaX = int256(endingX) - int256(startingX);
+    }
+
+    function deposit(uint256 wethAmount) public {
         wethAmount = bound(wethAmount, 0, type(uint64).max);
         startingY = int256(weth.balanceOf(address(this)));
         startingX = int256(poolToken.balanceOf(address(this)));
         expectedDeltaX = int256(wethAmount);
         expectedDeltaY = int256(pool.getPoolTokensToDepositBasedOnWeth(wethAmount));
-    
+
         // Pranking LP and minting tokens/approving the pool
         vm.startPrank(liquidityProvider);
         weth.mint(liquidityProvider, wethAmount);
@@ -48,7 +83,7 @@ contract Handler is Test {
         // Check Actual Deltas
         uint256 endingY = poolToken.balanceOf(address(this));
         uint256 endingX = weth.balanceOf(address(this));
-        
+
         actualDeltaY = int256(endingY) - int256(startingY);
         actualDeltaX = int256(endingX) - int256(startingX);
     }

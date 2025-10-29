@@ -2,11 +2,11 @@
 
 pragma solidity 0.8.20;
 
-import {Test} from "forge-std/Test.sol";
-import {StdInvariant} from "forge-std/StdInvariant.sol";
-import {ERC20Mock} from "test/mocks/ERC20Mock.sol";
-import {PoolFactory} from "../../src/PoolFactory.sol";
-import {TSwapPool} from "../../src/TSwapPool.sol";
+import { Test } from "forge-std/Test.sol";
+import { StdInvariant } from "forge-std/StdInvariant.sol";
+import { ERC20Mock } from "test/mocks/ERC20Mock.sol";
+import { PoolFactory } from "../../src/PoolFactory.sol";
+import { TSwapPool } from "../../src/TSwapPool.sol";
 
 contract Invariant is StdInvariant, Test {
     ERC20Mock poolToken;
@@ -32,11 +32,6 @@ contract Invariant is StdInvariant, Test {
         weth.approve(address(pool), type(uint256).max);
 
         // Deposit into Pool, gice the starting x & y balances
-        pool.deposit(
-            uint256(STARTING_Y),
-            uint256(STARTING_Y),
-            uint256(STARTING_X),
-            uint64(block.timestamp)
-        );
+        pool.deposit(uint256(STARTING_Y), uint256(STARTING_Y), uint256(STARTING_X), uint64(block.timestamp));
     }
 }
