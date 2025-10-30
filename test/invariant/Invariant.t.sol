@@ -17,7 +17,7 @@ contract Invariant is StdInvariant, Test {
     TSwapPool pool; // poolToken, weth
     Handler handler;
 
-    int256 constant STARTING_X = 100e18; // starting ERC20 / poolToken
+    int256 constant STARTING_X = 75e18; // starting ERC20 / poolToken
     int256 constant STARTING_Y = 50e18; // starting WETH
 
     function setUp() public {
@@ -44,7 +44,7 @@ contract Invariant is StdInvariant, Test {
         targetContract(address(handler));
     }
 
-    function statefulFuzz_constantProductFormulaStaysTheSame() public view {
-        assertEq(handler.actualDeltaX(), handler.expectedDeltaY());
+    function statefulFuzz_constantProductFormulaStaysTheSameY() public view {
+        assertEq(handler.actualDeltaY(), handler.expectedDeltaY());
     }
 }
