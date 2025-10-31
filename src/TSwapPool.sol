@@ -76,7 +76,7 @@ contract TSwapPool is ERC20 {
     )
         ERC20(liquidityTokenName, liquidityTokenSymbol)
     {
-        //@Audit - missing zero address checks
+        // @Audit-info - missing zero address checks
         i_wethToken = IERC20(wethToken);
         i_poolToken = IERC20(poolToken);
     }
