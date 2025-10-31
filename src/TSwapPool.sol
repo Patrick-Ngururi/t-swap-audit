@@ -98,6 +98,7 @@ contract TSwapPool is ERC20 {
         uint256 wethToDeposit,
         uint256 minimumLiquidityTokensToMint,
         uint256 maximumPoolTokensToDeposit,
+        // @Audit-High - unused parameter may lead to unsupported trust in protocol functionality. Deposits expected to fail may succeed.
         uint64 deadline
     )
         external
@@ -109,6 +110,7 @@ contract TSwapPool is ERC20 {
         }
         if (totalLiquidityTokenSupply() > 0) {
             uint256 wethReserves = i_wethToken.balanceOf(address(this));
+            // @Audit-Informational - Line unused, can be removed to save gas
             uint256 poolTokenReserves = i_poolToken.balanceOf(address(this));
             // Our invariant says weth, poolTokens, and liquidity tokens must always have the same ratio after the
             // initial deposit
@@ -286,6 +288,7 @@ contract TSwapPool is ERC20 {
         public
         revertIfZero(outputAmount)
         revertIfDeadlinePassed(deadline)
+        // @Audit-Low - Return value not updated/used
         returns (uint256 inputAmount)
     {
         uint256 inputReserves = inputToken.balanceOf(address(this));
