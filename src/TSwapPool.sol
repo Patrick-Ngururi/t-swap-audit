@@ -94,6 +94,7 @@ contract TSwapPool is ERC20 {
     /// @param maximumPoolTokensToDeposit The maximum amount of pool tokens the user is willing to deposit, again it's
     /// derived from the amount of WETH the user is going to deposit
     /// @param deadline The deadline for the transaction to be completed by
+    // @Audit - Review Complete - follow up
     function deposit(
         uint256 wethToDeposit,
         uint256 minimumLiquidityTokensToMint,
@@ -106,6 +107,7 @@ contract TSwapPool is ERC20 {
         returns (uint256 liquidityTokensToMint)
     {
         if (wethToDeposit < MINIMUM_WETH_LIQUIDITY) {
+            // @Audit-Informational: MINIMUM_WETH_LIQUIDITY is a constant, emitting unnecessary
             revert TSwapPool__WethDepositAmountTooLow(MINIMUM_WETH_LIQUIDITY, wethToDeposit);
         }
         if (totalLiquidityTokenSupply() > 0) {
@@ -145,6 +147,8 @@ contract TSwapPool is ERC20 {
             // This will be the "initial" funding of the protocol. We are starting from blank here!
             // We just have them send the tokens in, and we mint liquidity tokens based on the weth
             _addLiquidityMintAndTransfer(wethToDeposit, maximumPoolTokensToDeposit, wethToDeposit);
+            
+            // @audit - Informational - Not a state variable but would be better to follow CEI
             liquidityTokensToMint = wethToDeposit;
         }
     }
@@ -160,7 +164,9 @@ contract TSwapPool is ERC20 {
     )
         private
     {
+        // e follows CEI
         _mint(msg.sender, liquidityTokensToMint);
+        // @Audit-Low - Ordering of event emissions incorrect, should be `emit LiquidityAdded(msg.sender, wethToDeposit, poolTokensToDeposit)`
         emit LiquidityAdded(msg.sender, poolTokensToDeposit, wethToDeposit);
 
         // Interactions
