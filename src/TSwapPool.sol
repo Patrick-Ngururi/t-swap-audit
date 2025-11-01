@@ -236,6 +236,8 @@ contract TSwapPool is ERC20 {
         // totalPoolTokensOfPool) + (wethToDeposit * poolTokensToDeposit) = k
         // (totalWethOfPool * totalPoolTokensOfPool) + (wethToDeposit * totalPoolTokensOfPool) = k - (totalWethOfPool *
         // poolTokensToDeposit) - (wethToDeposit * poolTokensToDeposit)
+        
+        // @Audit-Informational - Use constants instead of literals, avoid magic numbers
         uint256 inputAmountMinusFee = inputAmount * 997;
         uint256 numerator = inputAmountMinusFee * outputReserves;
         uint256 denominator = (inputReserves * 1000) + inputAmountMinusFee;
@@ -250,9 +252,12 @@ contract TSwapPool is ERC20 {
         returns (uint256 inputAmount)
     {
         // @audit-info magic numbers
+        // @Audit-High - Erroneous fee calculation resulting in 90.03% fees
         return ((inputReserves * outputAmount) * 10000) / ((outputReserves - outputAmount) * 997);
     }
 
+    // @Audit-Informational - Where's the natspec?
+    // @Audit-Informational functions not used internally can be marked external to save gas.
     function swapExactInput(
         IERC20 inputToken,
         uint256 inputAmount,
