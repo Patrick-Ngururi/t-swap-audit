@@ -259,11 +259,12 @@ contract TSwapPool is ERC20 {
     // @Audit-Informational - Where's the natspec?
     // @Audit-Informational functions not used internally can be marked external to save gas.
     function swapExactInput(
-        IERC20 inputToken,
-        uint256 inputAmount,
-        IERC20 outputToken,
-        uint256 minOutputAmount,
-        uint64 deadline
+        IERC20 inputToken, // e imput token to swap / sell ie: DAI
+        uint256 inputAmount, // e amount of input token to sell ie: DAI 
+        IERC20 outputToken, // e output token to buy / buy ie: WETH
+        // e 7 DAI -> 1 WETH
+        uint256 minOutputAmount, // e minimum output amount expected to recieve
+        uint64 deadline // e deadline for when the transaction should expire
     )
 
     // @audit-info this should be external
@@ -332,7 +333,7 @@ contract TSwapPool is ERC20 {
             revert TSwapPool__InvalidToken();
         }
 
-        // @audit breaks protocol invariant!!!
+        // @audit - high breaks protocol invariant!!!
         swap_count++;
         // Fee-on-transfer
         if (swap_count >= SWAP_COUNT_MAX) {
