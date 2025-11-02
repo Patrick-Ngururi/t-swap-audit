@@ -45,7 +45,7 @@ contract TSwapPool is ERC20 {
     event LiquidityAdded(address indexed liquidityProvider, uint256 wethDeposited, uint256 poolTokensDeposited);
     event LiquidityRemoved(address indexed liquidityProvider, uint256 wethWithdrawn, uint256 poolTokensWithdrawn);
     
-    // @audit-info 3 events should be indexed. If there are more than 3 parameters 
+    // @written 3 events should be indexed. If there are more than 3 parameters 
     event Swap(address indexed swapper, IERC20 tokenIn, uint256 amountTokenIn, IERC20 tokenOut, uint256 amountTokenOut);
 
     /*//////////////////////////////////////////////////////////////
@@ -76,7 +76,7 @@ contract TSwapPool is ERC20 {
     )
         ERC20(liquidityTokenName, liquidityTokenSymbol)
     {
-        // @Audit-info - missing zero address checks
+        // @Written - missing zero address checks
         i_wethToken = IERC20(wethToken);
         i_poolToken = IERC20(poolToken);
     }
