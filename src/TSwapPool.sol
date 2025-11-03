@@ -309,7 +309,7 @@ contract TSwapPool is ERC20 {
 
         inputAmount = getInputAmountBasedOnOutput(outputAmount, inputReserves, outputReserves);
 
-        // @Audit-High - Needs slippage protection - maxInputAmount
+        // @Written- Needs slippage protection - maxInputAmount
         _swap(inputToken, inputAmount, outputToken, outputAmount);
     }
 

@@ -51,6 +51,51 @@ function getInputAmountBasedOnOutput(
 }
 ```
 
+## [H-3] Lack of slippage protection in `TSwapPool::swapExactOutput` causes users to potentially receive way fewer tokens
+
+**Description**: The `swapExactOutput` function does not include any sort of slippage protection. This function is similar to what is done in `TSwapPool::swapExactInput`, where the function specifies a `minOutputAmount`, the `swapExactOutput` function should specify a `maxInputAmount`.
+
+**Impact**: If market conditions change before the transaction processes, the user could get a much worse swap.
+
+**Proof of Concept**:
+
+    1. The price of 1 WETH right now is 1,000 USDC
+
+    2. User inputs a `swapExactOutput` looking for 1 WETH
+
+        a. inputToken = USDC
+
+        b. outputToken = WETH
+
+        c. outputAmount = 1
+
+        d. deadline = whatever
+
+    3. The function does not offer a maxInput amount
+
+    4. As the transaction is pending in the mempool, the market changes! And the price moves HUGE -> 1 WETH is now 10,000 USDC. 10x more than the user expected
+
+    5. The transaction completes, but the user sent the protocol 10,000 USDC instead of the expected 1,000 USDC
+
+**Recommended Mitigation**: We should include a `maxInputAmount` so the user only has to spend up to a specific amount, and can predict how much they will spend on the protocol.
+
+```diff
+    function swapExactOutput(
+        IERC20 inputToken,
++       uint256 maxInputAmount, 
+        ...
+    ){
+.
+.
+.
+        inputAmount = getInputAmountBasedOnOutput(outputAmount, inputReserves, outputReserves);
++       if(inputAmount > maxInputAmount){
++           revert();
++       }
+        _swap(inputToken, inputAmount, outputToken, outputAmount);
+    }
+```
+
 ## Medium
 
 ### [M-1] `TSwapPool::deposit` is missing deadline check causing transactions to complete even after the deadline
