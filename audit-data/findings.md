@@ -1,3 +1,32 @@
+## High
+
+
+## Medium
+
+### [M-1] `TSwapPool::deposit` is missing deadline check causing transactions to complete even after the deadline
+
+**Description:** The `deposit` function accepts a deadline parameter, which according to the documentation is "The deadline for the transaction to be completed by". However, this parameter is never used. As a consequence, operations that add liquidity to the pool might be executed at unexpected times, in market conditions where the deposit rate is unfavorable.
+
+**Impact:** Transactions could be sent when market conditions are unfavorable, even when adding a deadline parameter. 
+
+**Proof of Concept:** The `deadline` parameter is unused.
+
+**Recommended Mitigation:** Consider making the following change to the function:
+
+```diff
+function deposit(
+        uint256 wethToDeposit,
+        uint256 minimumLiquidityTokensToMint,
+        uint256 maximumPoolTokensToDeposit,
+        uint64 deadline
+    )
+        external
++       revertIfDeadlinePassed(deadline)
+        revertIfZero(wethToDeposit)
+        returns (uint256 liquidityTokensToMint)
+    {...}
+```
+
 ## Informationals
 
 ### [I-1]`PoolFactory::PoolFactory___PoolDoesNotExist` error is not used and should be removed.
