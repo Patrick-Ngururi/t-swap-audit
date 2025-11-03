@@ -109,6 +109,16 @@ This is due to the fact that the `swapExactOutput` function is called, whereas t
 **Recommended Mitigation**:
 Consider changing the implementation to use `swapExactInput` instead of `swapExactOutput`. Note that this would also require changing the `sellPoolTokens` function to accept a new parameter (ie `minWethToReceive` to be passed to `swapExactInput`)
 
+```diff 
+    function sellPoolTokens(
+        uint256 poolTokenAmount,
++       uint256 minWethToReceive,
+        ) external returns (uint256 wethAmount) {
+-        return swapExactOutput(i_poolToken, i_wethToken, poolTokenAmount, uint64(block.timestamp));
++        return swapExactInput(i_poolToken, poolTokenAmount, i_wethToken, minWethToReceive, uint64(block.timestamp));
+    }
+```
+
 ## Medium
 
 ### [M-1] `TSwapPool::deposit` is missing deadline check causing transactions to complete even after the deadline
