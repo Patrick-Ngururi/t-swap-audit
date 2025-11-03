@@ -96,6 +96,19 @@ function getInputAmountBasedOnOutput(
     }
 ```
 
+### [H-4] `TSwapPool::sellPoolTokens` mismatches input and output tokens causing users to receive the incorrect amount of tokens
+
+**Description**: The `sellPoolTokens` function is intended to allow users to easily sell pool tokens and receive WETH in exchange. Users indicate how many pool tokens they're willing to sell in the `poolTokenAmount` parameter. However, the function currently miscalculates the swapped amount.
+
+This is due to the fact that the `swapExactOutput` function is called, whereas the `swapExactInput` function is the one that should be called. Because users specify the exact amount of input tokens, not output.
+
+**Impact**: Users will swap the wrong amount of tokens, which is a severe disruption of protocol functionality.
+
+**Proof of Concept**:
+
+**Recommended Mitigation**:
+Consider changing the implementation to use `swapExactInput` instead of `swapExactOutput`. Note that this would also require changing the `sellPoolTokens` function to accept a new parameter (ie `minWethToReceive` to be passed to `swapExactInput`)
+
 ## Medium
 
 ### [M-1] `TSwapPool::deposit` is missing deadline check causing transactions to complete even after the deadline
