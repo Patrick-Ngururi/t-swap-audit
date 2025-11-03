@@ -166,7 +166,7 @@ contract TSwapPool is ERC20 {
     {
         // e follows CEI
         _mint(msg.sender, liquidityTokensToMint);
-        // @Audit-Low - Ordering of event emissions incorrect, should be `emit LiquidityAdded(msg.sender, wethToDeposit, poolTokensToDeposit)`
+        // @Written - Ordering of event emissions incorrect, should be `emit LiquidityAdded(msg.sender, wethToDeposit, poolTokensToDeposit)`
         emit LiquidityAdded(msg.sender, poolTokensToDeposit, wethToDeposit);
 
         // Interactions
@@ -237,7 +237,7 @@ contract TSwapPool is ERC20 {
         // (totalWethOfPool * totalPoolTokensOfPool) + (wethToDeposit * totalPoolTokensOfPool) = k - (totalWethOfPool *
         // poolTokensToDeposit) - (wethToDeposit * poolTokensToDeposit)
         
-        // @Audit-Informational - Use constants instead of literals, avoid magic numbers
+        // @Written - Use constants instead of literals, avoid magic numbers
         uint256 inputAmountMinusFee = inputAmount * 997;
         uint256 numerator = inputAmountMinusFee * outputReserves;
         uint256 denominator = (inputReserves * 1000) + inputAmountMinusFee;
@@ -251,13 +251,13 @@ contract TSwapPool is ERC20 {
         revertIfZero(outputReserves)
         returns (uint256 inputAmount)
     {
-        // @audit-info magic numbers
-        // @Audit-High - Erroneous fee calculation resulting in 90.03% fees
+        // @Written magic numbers
+        // @Written - Erroneous fee calculation resulting in 90.03% fees
         return ((inputReserves * outputAmount) * 10000) / ((outputReserves - outputAmount) * 997);
     }
 
-    // @Audit-Informational - Where's the natspec?
-    // @Audit-Informational functions not used internally can be marked external to save gas.
+    // @Written - Where's the natspec?
+    // @Written functions not used internally can be marked external to save gas.
     function swapExactInput(
         IERC20 inputToken, // e imput token to swap / sell ie: DAI
         uint256 inputAmount, // e amount of input token to sell ie: DAI 
@@ -267,10 +267,11 @@ contract TSwapPool is ERC20 {
         uint64 deadline // e deadline for when the transaction should expire
     )
 
-    // @audit-info this should be external
+    // @Written this should be external
         public
         revertIfZero(inputAmount)
         revertIfDeadlinePassed(deadline)
+        // @Written - Return value not updated/used
         returns (uint256 output)
     {
         uint256 inputReserves = inputToken.balanceOf(address(this));
