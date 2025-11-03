@@ -119,6 +119,8 @@ Consider changing the implementation to use `swapExactInput` instead of `swapExa
     }
 ```
 
+Additionally, it might be wise to add a deadline to the function, as there is currently no deadline. (MEV later)
+
 ## Medium
 
 ### [M-1] `TSwapPool::deposit` is missing deadline check causing transactions to complete even after the deadline
