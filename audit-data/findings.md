@@ -231,6 +231,18 @@ function deposit(
 {...}
 ```
 
+### [M-3] Rebase, `fee-on-transfer`, and `ERC-777` tokens break protocol invariant 
+
+**Description**: The core invariant of the protocol is:
+
+`x * y = k`. In practice though, the protocol takes fees and actually increases k. So we need to make sure `x * y = k` before fees are applied.
+
+**Impact**:
+
+**Proof of Concept**:
+
+**Recommended Mitigation**:
+
 ## Low
 
 ### [L-1] `TSwapPool::LiquidityAdded` event has parameters out of order

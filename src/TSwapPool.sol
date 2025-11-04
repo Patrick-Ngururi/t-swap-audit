@@ -366,7 +366,7 @@ contract TSwapPool is ERC20 {
     }
 
     /// @notice a more verbose way of getting the total supply of liquidity tokens
-    // @Audit-Informational - should be marked external
+    // @Written - should be marked external
     function totalLiquidityTokenSupply() public view returns (uint256) {
         return totalSupply();
     }
