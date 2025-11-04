@@ -91,4 +91,38 @@ contract TSwapPoolTest is Test {
         assertEq(pool.totalSupply(), 0);
         assert(weth.balanceOf(liquidityProvider) + poolToken.balanceOf(liquidityProvider) > 400e18);
     }
+
+    function testInvariantBroken() public {
+        vm.startPrank(liquidityProvider);
+        weth.approve(address(pool), 100e18);
+        poolToken.approve(address(pool), 100e18);
+        pool.deposit(100e18, 100e18, 100e18, uint64(block.timestamp));
+        vm.stopPrank();
+    
+        uint256 outputWeth = 1e17;
+
+        vm.startPrank(user);
+        poolToken.approve(address(pool), type(uint256).max);
+        poolToken.mint(user, 100e18);
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    
+        int256 startingX = int256(weth.balanceOf(address(pool)));
+        int256 expectedDeltaX = int256(outputWeth) * -1;
+
+        pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+        vm.stopPrank();
+    
+        int256 endingX = int256(weth.balanceOf(address(pool)));
+        int256 actualDeltaX = int256(endingX) - int256(startingX);
+    
+        assertEq(actualDeltaX, expectedDeltaX);
+    }
 }

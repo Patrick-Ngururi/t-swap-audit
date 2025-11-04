@@ -110,16 +110,100 @@ This is due to the fact that the `swapExactOutput` function is called, whereas t
 Consider changing the implementation to use `swapExactInput` instead of `swapExactOutput`. Note that this would also require changing the `sellPoolTokens` function to accept a new parameter (ie `minWethToReceive` to be passed to `swapExactInput`)
 
 ```diff 
-    function sellPoolTokens(
-        uint256 poolTokenAmount,
+function sellPoolTokens(
+    uint256 poolTokenAmount,
 +       uint256 minWethToReceive,
-        ) external returns (uint256 wethAmount) {
+    ) external returns (uint256 wethAmount) {
 -        return swapExactOutput(i_poolToken, i_wethToken, poolTokenAmount, uint64(block.timestamp));
 +        return swapExactInput(i_poolToken, poolTokenAmount, i_wethToken, minWethToReceive, uint64(block.timestamp));
-    }
+}
 ```
 
-Additionally, it might be wise to add a deadline to the function, as there is currently no deadline. (MEV later)
+Additionally, it might be wise to add a deadline to the function, as there is currently no deadline. 
+
+### [H-4] In `TSwapPool::_swap` the extra tokens given to users after every `swapCount` breaks the protocol invariant of `x * y = k`
+
+**Description**: The protocol follows a strict invariant of `x * y = k`. Where:
+
+`x`: The balance of the pool token
+
+`y`: The balance of WETH
+
+`k`: The constant product of the two balances
+
+This means, that whenever the balances change in the protocol, the ratio between the two amounts should remain constant, hence the `k`. However, this is broken due to the extra incentive in the `_swap` function. Meaning that over time the protocol funds will be drained.
+
+The follow block of code is responsible for the issue.
+
+```javascript
+swap_count++;
+if (swap_count >= SWAP_COUNT_MAX) {
+  swap_count = 0;
+  outputToken.safeTransfer(msg.sender, 1_000_000_000_000_000_000);
+}
+```
+
+**Impact**: A user could maliciously drain the protocol of funds by doing a lot of swaps and collecting the extra incentive given out by the protocol.
+
+Most simply put, the protocol's core invariant is broken.
+
+**Proof of Concept**:
+
+1. A user swaps 10 times, and collects the extra incentive of `1_000_000_000_000_000_000` tokens
+
+2. That user continues to swap until all the protocol funds are drained
+
+<details>
+<summary>Proof Of Code</summary>
+
+Place the following into `TSwapPool.t.sol`:
+
+```javascript
+function testInvariantBroken() public {
+    vm.startPrank(liquidityProvider);
+    weth.approve(address(pool), 100e18);
+    poolToken.approve(address(pool), 100e18);
+    pool.deposit(100e18, 100e18, 100e18, uint64(block.timestamp));
+    vm.stopPrank();
+​
+    uint256 outputWeth = 1e17;
+​
+    vm.startPrank(user);
+    poolToken.approve(address(pool), type(uint256).max);
+    poolToken.mint(user, 100e18);
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+​
+    int256 startingY = int256(weth.balanceOf(address(pool)));
+    int256 expectedDeltaY = int256(-1) * int256(outputWeth);
+​
+    pool.swapExactOutput(poolToken, weth, outputWeth, uint64(block.timestamp));
+    vm.stopPrank();
+​
+    uint256 endingY = weth.balanceOf(address(pool));
+    int256 actualDeltaY = int256(endingY) - int256(startingY);
+    assertEq(actualDeltaY, expectedDeltaY);
+}
+```
+</details>
+
+**Recommended Mitigation**: Remove the extra incentive mechanism. If you want to keep this in, we should account for the change in the `x * y = k` protocol invariant. Or, we should set aside tokens in the same way we do with fees.
+
+```diff
+-        swap_count++;
+-        // Fee-on-transfer
+-        if (swap_count >= SWAP_COUNT_MAX) {
+-            swap_count = 0;
+-            outputToken.safeTransfer(msg.sender, 1_000_000_000_000_000_000);
+-        }
+```
 
 ## Medium
 
