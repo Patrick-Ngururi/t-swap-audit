@@ -80,6 +80,14 @@ We use the [CodeHawks](https://docs.codehawks.com/hawks-auditors/how-to-evaluate
 ## Roles
 # Executive Summary
 ## Issues found
+| Severity | Number of issues found |
+| -------- | ---------------------- |
+| High     | 5                      |
+| Medium   | 2                      |
+| Low      | 2                      |
+| Info     | 5                      |
+| Gas      | 0                      |
+| Total    | 14                     |
 # Findings
 ## High
 
@@ -314,7 +322,7 @@ function deposit(
 {...}
 ```
 
-### [M-3] Rebase, `fee-on-transfer`, and `ERC-777` tokens break protocol invariant 
+### [M-2] Rebase, `fee-on-transfer`, and `ERC-777` tokens break protocol invariant 
 
 **Description**: The core invariant of the protocol is:
 
