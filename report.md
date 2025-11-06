@@ -53,14 +53,14 @@ Changing state after an external call can lead to re-entrancy attacks.Use the ch
 <details><summary>2 Found Instances</summary>
 
 
-- Found in src/PoolFactory.sol [Line: 52](src/PoolFactory.sol#L52)
+- Found in src/PoolFactory.sol [Line: 57](src/PoolFactory.sol#L57)
 
 	State is changed at: `s_pools[tokenAddress] = address(tPool)`, `s_tokens[address(tPool)] = tokenAddress`
 	```solidity
 	        string memory liquidityTokenName = string.concat("T-Swap ", IERC20(tokenAddress).name());
 	```
 
-- Found in src/PoolFactory.sol [Line: 53](src/PoolFactory.sol#L53)
+- Found in src/PoolFactory.sol [Line: 60](src/PoolFactory.sol#L60)
 
 	State is changed at: `s_pools[tokenAddress] = address(tPool)`, `s_tokens[address(tPool)] = tokenAddress`
 	```solidity
@@ -80,7 +80,7 @@ If a function is marked public but is not used internally, consider marking it a
 <details><summary>1 Found Instances</summary>
 
 
-- Found in src/TSwapPool.sol [Line: 244](src/TSwapPool.sol#L244)
+- Found in src/TSwapPool.sol [Line: 261](src/TSwapPool.sol#L261)
 
 	```solidity
 	    function swapExactInput(
@@ -97,25 +97,25 @@ Define and use `constant` variables instead of using literals. If the same const
 <details><summary>4 Found Instances</summary>
 
 
-- Found in src/TSwapPool.sol [Line: 228](src/TSwapPool.sol#L228)
+- Found in src/TSwapPool.sol [Line: 241](src/TSwapPool.sol#L241)
 
 	```solidity
 	        uint256 inputAmountMinusFee = inputAmount * 997;
 	```
 
-- Found in src/TSwapPool.sol [Line: 241](src/TSwapPool.sol#L241)
+- Found in src/TSwapPool.sol [Line: 256](src/TSwapPool.sol#L256)
 
 	```solidity
 	        return ((inputReserves * outputAmount) * 10000) / ((outputReserves - outputAmount) * 997);
 	```
 
-- Found in src/TSwapPool.sol [Line: 364](src/TSwapPool.sol#L364)
+- Found in src/TSwapPool.sol [Line: 389](src/TSwapPool.sol#L389)
 
 	```solidity
 	                1e18, i_wethToken.balanceOf(address(this)), i_poolToken.balanceOf(address(this))
 	```
 
-- Found in src/TSwapPool.sol [Line: 371](src/TSwapPool.sol#L371)
+- Found in src/TSwapPool.sol [Line: 396](src/TSwapPool.sol#L396)
 
 	```solidity
 	                1e18, i_poolToken.balanceOf(address(this)), i_wethToken.balanceOf(address(this))
@@ -161,13 +161,13 @@ Large literal values multiples of 10000 can be replaced with scientific notation
 	    uint256 private constant MINIMUM_WETH_LIQUIDITY = 1_000_000_000;
 	```
 
-- Found in src/TSwapPool.sol [Line: 241](src/TSwapPool.sol#L241)
+- Found in src/TSwapPool.sol [Line: 256](src/TSwapPool.sol#L256)
 
 	```solidity
 	        return ((inputReserves * outputAmount) * 10000) / ((outputReserves - outputAmount) * 997);
 	```
 
-- Found in src/TSwapPool.sol [Line: 320](src/TSwapPool.sol#L320)
+- Found in src/TSwapPool.sol [Line: 344](src/TSwapPool.sol#L344)
 
 	```solidity
 	            outputToken.safeTransfer(msg.sender, 1_000_000_000_000_000_000);
@@ -184,7 +184,7 @@ Consider using or removing the unused error.
 <details><summary>1 Found Instances</summary>
 
 
-- Found in src/PoolFactory.sol [Line: 22](src/PoolFactory.sol#L22)
+- Found in src/PoolFactory.sol [Line: 24](src/PoolFactory.sol#L24)
 
 	```solidity
 	    error PoolFactory__PoolDoesNotExist(address tokenAddress);
